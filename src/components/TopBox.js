@@ -4,6 +4,8 @@ import { ThemeContext } from 'grommet/contexts'
 import { func } from 'prop-types'
 import { Configure, Action, Connectivity } from 'grommet-icons'
 import ConfigurationModal from './ConfigurationModal'
+import MDSpinner from 'react-md-spinner'
+
 const { ipcRenderer } = window.require('electron')
 
 class TopBox extends React.Component {
@@ -17,7 +19,8 @@ class TopBox extends React.Component {
     select: '',
     error: false,
     connectionData: {},
-    buttonDisabled: false
+    buttonDisabled: false,
+    buttonLoading: false
   }
 
   componentDidMount() {
@@ -32,15 +35,23 @@ class TopBox extends React.Component {
   }
 
   handleQueueConnected = (event, arg) => {
-    this.setState({ connected: true, buttonDisabled: false })
+    this.setState({
+      connected: true,
+      buttonDisabled: false,
+      buttonLoading: false
+    })
   }
 
   handleQueueConnectionFailed = (event, arg) => {
-    this.setState({ error: true, buttonDisabled: false })
+    this.setState({ error: true, buttonDisabled: false, buttonLoading: false })
   }
 
   handleQueueDisconnected = (event, arg) => {
-    this.setState({ connected: false, buttonDisabled: false })
+    this.setState({
+      connected: false,
+      buttonDisabled: false,
+      buttonLoading: false
+    })
   }
 
   handleEventArrival = (event, arg) => {
@@ -48,12 +59,12 @@ class TopBox extends React.Component {
   }
 
   handleOnClickConnect = () => {
-    this.setState({ buttonDisabled: true })
+    this.setState({ buttonDisabled: true, buttonLoading: true })
     ipcRenderer.send('connect-queue', this.state.connectionData)
   }
 
   handleOnClickDisconnect = () => {
-    this.setState({ buttonDisabled: true })
+    this.setState({ buttonDisabled: true, buttonLoading: true })
     ipcRenderer.send('disconnect-queue')
   }
 
@@ -91,27 +102,35 @@ class TopBox extends React.Component {
     }
   }
 
-  render() {
-    const { showSettings } = this.state
+  renderSettingsButton = () => {
+    return (
+      <Button
+        hoverIndicator
+        focusIndicator={false}
+        icon={<Configure color="accent-1" />}
+        onClick={this.handleOnClickSettings}
+      >
+        {this.state.showSettings && (
+          <ConfigurationModal
+            onClose={this.onSettingsClose}
+            connectionData={this.state.connectionData}
+          />
+        )}
+      </Button>
+    )
+  }
 
+  render() {
     return (
       <Box direction="row" justify="between">
         <ThemeContext.Extend
           value={{ button: { border: { radius: '0px', width: '0px' } } }}
         >
           {this.renderConnectionButton()}
-          <Button
-            hoverIndicator
-            focusIndicator={false}
-            icon={<Configure color="accent-1" />}
-            onClick={this.handleOnClickSettings}
-          />
-          {showSettings && (
-            <ConfigurationModal
-              onClose={this.onSettingsClose}
-              connectionData={this.state.connectionData}
-            />
-          )}
+          <Box direction="row" justify="start" align="center" fill="horizontal">
+            {this.state.buttonLoading && <MDSpinner singleColor="#81FCED" />}
+          </Box>
+          {this.renderSettingsButton()}
         </ThemeContext.Extend>
       </Box>
     )
