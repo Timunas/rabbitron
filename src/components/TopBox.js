@@ -109,14 +109,7 @@ class TopBox extends React.Component {
         focusIndicator={false}
         icon={<Configure color="accent-1" />}
         onClick={this.handleOnClickSettings}
-      >
-        {this.state.showSettings && (
-          <ConfigurationModal
-            onClose={this.onSettingsClose}
-            connectionData={this.state.connectionData}
-          />
-        )}
-      </Button>
+      />
     )
   }
 
@@ -132,6 +125,12 @@ class TopBox extends React.Component {
           </Box>
           {this.renderSettingsButton()}
         </ThemeContext.Extend>
+        {this.state.showSettings && (
+          <ConfigurationModal
+            onClose={this.onSettingsClose}
+            connectionData={this.state.connectionData}
+          />
+        )}
       </Box>
     )
   }
