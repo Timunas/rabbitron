@@ -16,6 +16,8 @@ const theme = {
 class App extends Component {
   state = { events: [] }
 
+  onReset = () => this.setState({ events: [] })
+
   onEventArrival = event => {
     console.log('Event: ', event)
     if (event) {
@@ -43,7 +45,7 @@ class App extends Component {
     return (
       <Grommet theme={theme} full>
         <Box background="dark-1" height="full">
-          <TopBox queueCallback={this.onEventArrival} />
+          <TopBox queueCallback={this.onEventArrival} onReset={this.onReset} />
           <LoggingBox events={events} />
         </Box>
       </Grommet>

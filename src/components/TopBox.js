@@ -2,7 +2,7 @@ import React from 'react'
 import { Box, Button } from 'grommet'
 import { ThemeContext } from 'grommet/contexts'
 import { func } from 'prop-types'
-import { Configure, Action, Connectivity } from 'grommet-icons'
+import { Configure, Action, Connectivity, Trash } from 'grommet-icons'
 import ConfigurationModal from './ConfigurationModal'
 import MDSpinner from 'react-md-spinner'
 
@@ -10,7 +10,8 @@ const { ipcRenderer } = window.require('electron')
 
 class TopBox extends React.Component {
   static propTypes = {
-    queueCallback: func.isRequired
+    queueCallback: func.isRequired,
+    onReset: func.isRequired
   }
 
   state = {
@@ -113,6 +114,17 @@ class TopBox extends React.Component {
     )
   }
 
+  renderResetButton = () => {
+    return (
+      <Button
+        hoverIndicator
+        focusIndicator={false}
+        icon={<Trash color="accent-1" />}
+        onClick={this.props.onReset}
+      />
+    )
+  }
+
   render() {
     return (
       <Box direction="row" justify="between">
@@ -124,6 +136,7 @@ class TopBox extends React.Component {
             {this.state.buttonLoading && <MDSpinner singleColor="#81FCED" />}
           </Box>
           {this.renderSettingsButton()}
+          {this.renderResetButton()}
         </ThemeContext.Extend>
         {this.state.showSettings && (
           <ConfigurationModal
