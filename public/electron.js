@@ -46,8 +46,13 @@ app.on('activate', () => {
 })
 
 ipc.on('connect-queue', function(event, arg) {
-  console.log(arg)
-  consumeFromQueue(event)
+  if (arg) {
+    arg.exchange_type === 'none'
+      ? consumeFromQueue(event, arg)
+      : consumeFromExchange(event, arg)
+  } else {
+    event.sender.send('queue-connection-failed', 'Invalid settings')
+  }
 })
 
 ipc.on('disconnect-queue', function(event, arg) {
@@ -58,32 +63,124 @@ ipc.on('disconnect-queue', function(event, arg) {
   }
 })
 
-function consumeFromQueue(event) {
+function consumeFromQueue(event, connectionData) {
+  const {
+    hostname,
+    port,
+    username,
+    password,
+    vhost,
+    queue_name
+  } = connectionData
+
+  const connectionUrl = {
+    protocol: 'amqp',
+    hostname,
+    port,
+    vhost,
+    username,
+    password
+  }
+
   amqp
-    .connect('amqp://localhost')
+    .connect(connectionUrl)
+    .then(conn => {
+      connection = conn
+      conn.on('error', function(error) {
+        mainWindow.webContents.send('queue-connection-failed', error)
+      })
+
+      return conn.createChannel()
+    })
+    .then(ch => {
+      var q = ch.assertQueue(queue_name, { durable: false })
+      return q.then(() => {
+        return ch
+      })
+    })
+    .then(ch => {
+      ch.consume(
+        queue_name,
+        msg => {
+          if (msg && msg.content) {
+            mainWindow.webContents.send('event-arrival', msg.content.toString())
+          }
+        },
+        { noAck: true }
+      )
+
+      event.sender.send('queue-connected')
+    })
+    .catch(error => event.sender.send('queue-connection-failed', error))
+}
+
+function consumeFromExchange(event, connectionData) {
+  const {
+    exchange_type,
+    hostname,
+    port,
+    username,
+    password,
+    vhost,
+    exchange_name,
+    routing_key,
+    queue_name
+  } = connectionData
+
+  const connectionUrl = {
+    protocol: 'amqp',
+    hostname,
+    port,
+    vhost,
+    username,
+    password
+  }
+
+  amqp
+    .connect(connectionUrl)
     .then(conn => {
       connection = conn
 
-      conn.createChannel().then(ch => {
-        var q = 'hello'
+      conn.on('error', function(error) {
+        mainWindow.webContents.send('queue-connection-failed', error)
+      })
 
-        ch.assertQueue(q, { durable: false }).then(data => {
-          ch.consume(
-            data.queue,
-            msg => {
-              if (msg && msg.content) {
-                mainWindow.webContents.send(
-                  'event-arrival',
-                  msg.content.toString()
-                )
-              }
-            },
-            { noAck: true }
-          )
-
-          event.sender.send('queue-connected')
-        })
+      return conn.createChannel()
+    })
+    .then(ch => {
+      var ex = ch.assertExchange(exchange_name, exchange_type, {
+        durable: false
+      })
+      return ex.then(() => {
+        return ch
       })
     })
-    .catch(error => event.sender.send('queue-connection-failed'))
+    .then(ch => {
+      var data = ch.assertQueue(queue_name, { exclusive: true })
+      return data.then(() => {
+        return { ch, queue: data.queue }
+      })
+    })
+    .then(channelData => {
+      const { ch, queue } = channelData
+      var q = ch.bindQueue(queue, exchange_name, routing_key)
+      return q.then(() => {
+        return { ch, queue }
+      })
+    })
+    .then(channelData => {
+      const { ch, queue } = channelData
+      ch.consume(
+        queue,
+        msg => {
+          if (msg && msg.content) {
+            mainWindow.webContents.send('event-arrival', msg.content.toString())
+          }
+        },
+        { noAck: true }
+      )
+
+      event.sender.send('queue-connected')
+    })
+    .catch(error => event.sender.send('queue-connection-failed', error))
 }

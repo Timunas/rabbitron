@@ -18,11 +18,11 @@ class ConfigurationModal extends React.Component {
 
   state = {
     exchange_type: 'none',
-    hostname: '',
-    port: '',
-    username: '',
-    password: '',
-    vhost: '',
+    hostname: 'localhost',
+    port: '5672',
+    username: 'guest',
+    password: 'guest',
+    vhost: '/',
     exchange_name: '',
     routing_key: '',
     queue_name: ''
