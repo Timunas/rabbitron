@@ -22,7 +22,7 @@ class App extends Component {
     console.log('Event: ', event)
     if (event) {
       const parsedEvent = this.isJson(event)
-        ? JSON.stringify(event, undefined, 2)
+        ? JSON.stringify(JSON.parse(event), undefined, 2)
         : event
 
       this.setState(prevState => ({
