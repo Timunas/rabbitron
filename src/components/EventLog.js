@@ -23,7 +23,9 @@ class EventLog extends React.Component {
         alignSelf="center"
       >
         <Box>
-          <Text textAlign="center">{this.props.text}</Text>
+          <Text textAlign="center" truncate>
+            {this.props.text}
+          </Text>
         </Box>
       </Button>
     )

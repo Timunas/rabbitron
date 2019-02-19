@@ -27,6 +27,7 @@ class LoggingBox extends React.Component {
         fill
         overflow="auto"
         border={{ side: 'top', color: 'brand', size: 'small' }}
+        pad={{ top: 'xsmall' }}
       >
         <InfiniteScroll items={events}>
           {item => (
