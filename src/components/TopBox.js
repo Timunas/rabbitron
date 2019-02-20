@@ -5,6 +5,7 @@ import { func } from 'prop-types'
 import { Configure, Action, Connectivity, Trash } from 'grommet-icons'
 import ConfigurationModal from './ConfigurationModal'
 import MDSpinner from 'react-md-spinner'
+import ErrorModal from './ErrorModal'
 
 const { ipcRenderer } = window.require('electron')
 
@@ -34,6 +35,8 @@ class TopBox extends React.Component {
   onSettingsClose = connectionData => {
     this.setState({ showSettings: false, connectionData })
   }
+
+  onErrorDismiss = () => this.setState({ error: false })
 
   handleQueueConnected = (event, arg) => {
     this.setState({
@@ -144,6 +147,7 @@ class TopBox extends React.Component {
             connectionData={this.state.connectionData}
           />
         )}
+        {this.state.error && <ErrorModal onClose={this.onErrorDismiss} />}
       </Box>
     )
   }
