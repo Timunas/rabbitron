@@ -9,6 +9,7 @@ import {
   Select,
   TextInput
 } from 'grommet'
+import { ThemeContext } from 'grommet/contexts'
 
 class ConfigurationModal extends React.Component {
   static propTypes = {
@@ -121,13 +122,22 @@ class ConfigurationModal extends React.Component {
               <TextInput onChange={this.onVhostChange} value={vhost} />
             </FormField>
             <FormField label="Exchange Type">
-              <Select
-                options={['none', 'direct', 'fanout', 'topic']}
-                value={exchange_type}
-                onChange={({ option }) =>
-                  this.setState({ exchange_type: option })
-                }
-              />
+              <ThemeContext.Extend
+                value={{
+                  global: {
+                    control: { border: { radius: '0px', width: '0px' } }
+                  }
+                }}
+              >
+                <Select
+                  plain={false}
+                  options={['none', 'direct', 'fanout', 'topic']}
+                  value={exchange_type}
+                  onChange={({ option }) =>
+                    this.setState({ exchange_type: option })
+                  }
+                />
+              </ThemeContext.Extend>
             </FormField>
             <FormField label="Exchange Name">
               <TextInput
