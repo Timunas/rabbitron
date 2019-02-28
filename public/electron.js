@@ -93,7 +93,7 @@ function consumeFromQueue(event, connectionData) {
       return conn.createChannel()
     })
     .then(ch => {
-      var q = ch.assertQueue(queue_name, { durable: false })
+      var q = ch.assertQueue(queue_name)
       return q.then(() => {
         return ch
       })
@@ -148,15 +148,13 @@ function consumeFromExchange(event, connectionData) {
       return conn.createChannel()
     })
     .then(ch => {
-      var ex = ch.assertExchange(exchange_name, exchange_type, {
-        durable: false
-      })
+      var ex = ch.assertExchange(exchange_name, exchange_type)
       return ex.then(() => {
         return ch
       })
     })
     .then(ch => {
-      var data = ch.assertQueue(queue_name, { exclusive: true })
+      var data = ch.assertQueue(queue_name)
       return data.then(() => {
         return { ch, queue: data.queue }
       })
