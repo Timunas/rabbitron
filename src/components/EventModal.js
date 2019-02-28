@@ -15,7 +15,7 @@ class EventModal extends React.Component {
 
     return (
       <Layer position="center" modal onClickOutside={onClose} onEsc={onClose}>
-        <Box pad="medium" gap="small" width="medium">
+        <Box pad="medium" gap="small" width="large">
           <Heading level={3} margin="none">
             Event
           </Heading>
