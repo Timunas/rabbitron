@@ -1,7 +1,10 @@
 {
   "name": "rabbitron",
   "version": "0.1.0",
-  "author": "Timunas",
+  "author": {
+    "name": "Timunas",
+    "email": "joao.suzana@protonmail.com"
+  },
   "private": true,
   "main": "public/electron.js",
   "homepage": "./",
@@ -23,7 +26,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron-dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && electron .\"",
-    "electron-pack": "build -c.extraMetadata.main=build/electron.js",
+    "electron-pack": "build -c.extraMetadata.main=build/electron.js -lw",
     "preelectron-pack": "yarn build"
   },
   "eslintConfig": {
@@ -48,7 +51,21 @@
       "node_modules/**/*"
     ],
     "directories": {
-      "buildResources": "assets"
+      "buildResources": "build/assets"
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "rpm"
+      ],
+      "executableName": "rabbitron",
+      "category": "Utility"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "publisherName": "Timunas"
     }
   }
 }
