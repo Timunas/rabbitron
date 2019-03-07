@@ -1,5 +1,6 @@
 const electron = require('electron')
 const app = electron.app
+const Menu = electron.Menu
 const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 const isDev = require('electron-is-dev')
@@ -29,6 +30,29 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     mainWindow.show()
   })
+
+  // Check if we are on a MAC
+  if (process.platform === 'darwin') {
+    // Create our menu entries so that we can use MAC shortcuts
+    Menu.setApplicationMenu(
+      Menu.buildFromTemplate([
+        {
+          label: 'Edit',
+          submenu: [
+            { role: 'undo' },
+            { role: 'redo' },
+            { type: 'separator' },
+            { role: 'cut' },
+            { role: 'copy' },
+            { role: 'paste' },
+            { role: 'pasteandmatchstyle' },
+            { role: 'delete' },
+            { role: 'selectall' }
+          ]
+        }
+      ])
+    )
+  }
 }
 
 app.on('ready', createWindow)
