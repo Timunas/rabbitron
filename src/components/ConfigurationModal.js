@@ -9,6 +9,7 @@ import {
   Select,
   TextInput
 } from 'grommet'
+import { FormLock, View } from 'grommet-icons'
 import { ThemeContext } from 'grommet/contexts'
 
 class ConfigurationModal extends React.Component {
@@ -26,7 +27,8 @@ class ConfigurationModal extends React.Component {
     vhost: '/',
     exchange_name: '',
     routing_key: '',
-    queue_name: ''
+    queue_name: '',
+    reveal: false
   }
 
   componentWillMount() {
@@ -49,6 +51,10 @@ class ConfigurationModal extends React.Component {
 
   onPasswordChange = event => {
     this.setState({ password: event.target.value })
+  }
+
+  onPasswordRevealClick = () => {
+    this.setState({ reveal: !this.state.reveal })
   }
 
   onVhostChange = event => {
@@ -81,7 +87,8 @@ class ConfigurationModal extends React.Component {
       vhost,
       exchange_name,
       routing_key,
-      queue_name
+      queue_name,
+      reveal
     } = this.state
 
     return (
@@ -116,7 +123,20 @@ class ConfigurationModal extends React.Component {
               <TextInput onChange={this.onUsernameChange} value={username} />
             </FormField>
             <FormField label="Password">
-              <TextInput onChange={this.onPasswordChange} value={password} />
+              <Box direction="row">
+                <TextInput
+                  plain
+                  type={reveal ? 'text' : 'password'}
+                  value={password}
+                  onChange={this.onPasswordChange}
+                />
+                <Button
+                  icon={
+                    reveal ? <FormLock size="medium" /> : <View size="medium" />
+                  }
+                  onClick={this.onPasswordRevealClick}
+                />
+              </Box>
             </FormField>
             <FormField label="VHost">
               <TextInput onChange={this.onVhostChange} value={vhost} />
